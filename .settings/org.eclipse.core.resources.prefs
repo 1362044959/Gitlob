@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+encoding//src/cn/appinfodb/entity/AdPromotion.java=UTF-8
+encoding//src/cn/appinfodb/entity/AppCategory.java=UTF-8
+encoding//src/cn/appinfodb/entity/AppInfo.java=UTF-8
+encoding//src/cn/appinfodb/entity/AppVersion.java=UTF-8
+encoding//src/cn/appinfodb/entity/BackendUser.java=UTF-8
+encoding//src/cn/appinfodb/entity/DataDictionary.java=UTF-8
+encoding//src/cn/appinfodb/entity/DevUser.java=UTF-8
+encoding//src/cn/appinfodb/servlet/developer/developerDevUserServlet.java=UTF-8
+encoding//src/cn/appinfodb/tools/Constants.java=UTF-8
+encoding//src/cn/appinfodb/tools/PageSupport.java=UTF-8

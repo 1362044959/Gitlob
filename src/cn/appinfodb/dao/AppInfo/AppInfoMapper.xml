@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.appinfodb.dao.AppInfo.AppInfoMapper">
+
+<select id="getAppInfoList" resultType="AppInfo">
+SELECT i.softwareName,i.APKName,i.softwareSize,i.*,
+(SELECT d.valueName from data_dictionary d where d.typeCode='APP_FLATFORM' and d.valueId=i.flatformId) as flatformName,
+(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel3) as categoryLevel3Name,
+(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel2) as categoryLevel2Name,
+(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel1) as categoryLevel1Name,
+(SELECT d.valueName from data_dictionary d  where d.typeCode='APP_STATUS' and d.valueId=i.`status`) as statusName,supportROM as versionNo,downloads
+from app_info i where 1=1 
+<if test="softwareName != null and softwareName !=''"> and softwareName LIKE CONCAT('%',#{softwareName},'%') </if>
+<if test="status != null "> and status=#{status}</if>
+<if test="flatformId != null "> and flatformId=#{flatformId}</if>
+<if test="categoryLevel1 != null "> and categoryLevel1=#{categoryLevel1}</if>
+<if test="categoryLevel2 != null "> and categoryLevel2=#{categoryLevel2}</if>
+<if test="categoryLevel3 != null "> and categoryLevel3=#{categoryLevel3}</if>
+LIMIT #{getCurrentPageNo} ,#{getPageSize}
+</select>
+
+<delete id="deleteAppInfo">
+	DELETE from app_info  where id=#{id}
+</delete>
+
+
+<select id="getAppInfoID" resultType="AppInfo">
+	SELECT i.softwareName,i.APKName,i.softwareSize,
+	(SELECT d.valueName from data_dictionary d where d.typeCode='APP_FLATFORM' and d.valueId=i.flatformId) as flatformName,
+	(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel3) as categoryLevel3Name,
+	(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel2) as categoryLevel2Name,
+	(SELECT c.categoryName  from app_category c where c.id=i.categoryLevel1) as categoryLevel1Name,
+	(SELECT d.valueName from data_dictionary d  where d.typeCode='APP_STATUS' and d.valueId=i.`status`) as statusName,
+	(select v.versionNo from app_version v where v.id=i.versionId) as versionNo,i.*
+	from app_info as i where i.id=#{id}
+</select>
+
+<update id="updateAppInfo">
+	update app_info 
+	<set>
+		<if test="softwareName != null and softwareName !=''">softwareName=#{softwareName},</if>
+		<if test="APKName != null and APKName !=''">APKName=#{APKName},</if>
+		<if test="supportROM != null and supportROM !=''">supportROM=#{supportROM},</if>
+		<if test="interfaceLanguage != null and interfaceLanguage !=''">interfaceLanguage=#{interfaceLanguage},</if>
+		<if test="softwareSize != null and softwareSize !=''">softwareSize=#{softwareSize},</if>
+		<if test="downloads != null and downloads !=''">downloads=#{downloads},</if>
+		<if test="categoryLevel1 != null and categoryLevel1 !=''">categoryLevel1=#{categoryLevel1},</if>
+		<if test="categoryLevel2 != null and categoryLevel2 !=''">categoryLevel2=#{categoryLevel2},</if>
+		<if test="categoryLevel3 != null and categoryLevel3 !=''">categoryLevel3=#{categoryLevel3},</if>
+		<if test="flatformId != null and flatformId !=''">flatformId=#{flatformId},</if>
+		<if test="status != null and status !=''">status=#{status},</if>
+		<if test="modifyDate != null and modifyDate !=''">modifyDate=#{modifyDate},</if>
+		<if test="logoPicPath != null and logoPicPath !=''">logoPicPath=#{logoPicPath},</if>
+		<if test="logoLocPath != null and logoLocPath !=''">logoLocPath=#{logoLocPath},</if>
+		<if test="versionId != null and versionId !=''">versionId=#{versionId},</if>
+	</set>
+		 where id=#{id}
+</update>
+	
+<select id="getAppInfologoPicPath" resultType="String">
+	select logoLocPath from app_info WHERE id=#{id}
+</select>
+<update id="deleteAppInfologoPicPath">
+	update app_info set logoPicPath=null,logoLocPath = null where id = #{id}
+</update>
+
+
+<select id="getAppInfo" resultType="AppInfo">
+		select * ,
+			(select devName from dev_user where id = a.devId) as devName,
+			(select valueName from data_dictionary d where  a.status=d.valueId AND d.typeCode='APP_STATUS') as statusName,
+			(select valueName from data_dictionary d where  a.status=d.valueId AND d.typeCode='APP_FLATFORM') as flatformName,
+			(select categoryName from app_category c where  c.id=a.categoryLevel1) as categoryLevel1Name,
+			(select categoryName from app_category c where  c.id=a.categoryLevel2) as categoryLevel2Name,
+			(select categoryName from app_category c where  c.id=a.categoryLevel3) as categoryLevel3Name,
+			(select v.versionNo from app_version v where v.id=a.versionId ) as versionNo
+		  	from app_info a
+		  <trim prefix="where" prefixOverrides="and | or">
+				<if test="id != null">
+					and a.id = #{id}
+				</if>
+				<if test="APKName != null">
+					and a.APKName = #{APKName}
+				</if>
+		  </trim>
+	</select>
+	
+	<insert id="add" parameterType="AppInfo">
+		insert into app_info (softwareName,APKName,supportROM,interfaceLanguage,updateDate,softwareSize,
+							devId,appInfo,status,onSaleDate,offSaleDate,categoryLevel1,categoryLevel2,
+							categoryLevel3,downloads,flatformId,logoPicPath,logoLocPath,createdBy,creationDate)
+				values(#{softwareName},#{APKName},#{supportROM},#{interfaceLanguage},#{updateDate},
+					   #{softwareSize},#{devId},#{appInfo},#{status},#{onSaleDate},#{offSaleDate},
+					   #{categoryLevel1},#{categoryLevel2},#{categoryLevel3},#{downloads},
+					   #{flatformId},#{logoPicPath},#{logoLocPath},#{createdBy},#{creationDate})
+	</insert>
+	<update id="updateAppInfolower">
+		update app_info set `status`=#{ja} where id=#{id}
+	</update>
+	
+	<select id="AppInfoCount" resultType="int">
+		select count(*) from app_info where
+	<if test="softwareName != null and softwareName !=''"> and softwareName LIKE CONCAT('%',#{softwareName},'%') </if>
+<if test="softwareName != null and softwareName !=''"> and softwareName LIKE CONCAT('%',#{softwareName},'%') </if>
+<if test="flatformId != null "> and flatformId=#{flatformId}</if>
+<if test="categoryLevel1 != null "> and categoryLevel1=#{categoryLevel1}</if>
+<if test="categoryLevel2 != null "> and categoryLevel2=#{categoryLevel2}</if>
+<if test="categoryLevel3 != null "> and categoryLevel3=#{categoryLevel3}</if>
+	</select>
+
+	
+</mapper>
